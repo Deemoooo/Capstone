@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../static/css/style.css">
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+      {{ dropzone.load() }}
+      {{ dropzone.config(custom_options='previewsContainer: ".dropzone-previews",
+        addRemoveLinks: true,
+        previewTemplate: "<div class=uploaded-image> <div class=dataname data-dz-name></div><div class=dz-error-message data-dz-errormessage></div><div class=dz-progress><span class=dz-upload data-dz-uploadprogress></span></div></div>",
+        removedfile: function(file) {
+            console.log(file.name);
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify({"name": file.name}),
+                dataType: "json",
+                contentType: "application/json;charset=UTF-8",
+            })
+        var _ref;
+        return (_ref = file.previewElement) != null ? _ref.parentNode.removeChild(file.previewElement) : void 0;
+        }
+      ') }}
+      {{ dropzone.style('height: 100%; width: 100%; border: 3px solid #D1D3D4; background-color: #F1F2F2;') }}
+
+  </head>
+  <body>
+    <div class="container">
+        <div class="navi in">
+            <div class="row">
+                <div class="logo col-sm-11"></div>
+                <div class="col-sm-1">
+                    <!-- <div class="infobtn"></div> -->
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="content in2">
+             <div class="row">
+                <div class="col-md-8">
+                    <form action="/" method="post" class="dropzone dz-clickable" id="myDropzone" enctype="multipart/form-data">
+
+                        <div class="dz-default dz-message">
+                            <div class="text">
+                                <div class="uploadbtn">
+                                </div>
+                                <div id="h1">Drop files here or click to upload.</div>
+                                <div id="h2">Compatible Extension: PDF, XLSB</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-4 dropzone">
+                    <div class="dropzone-previews"></div>
+                </div>
+            </div>
+            <div>
+                <button type="button" onclick="window.location.href='/load'" id='processbtn'>Analyse</button>
+            </div>
+        </div>
+
+
+    </div>
+
+  </body>
+</html>
+
+<script>
+    $(function(){
+
+    var refreshFilenameList = function(data){
+        var templateText = $("#tableTemplate").html();
+        var template = Handlebars.compile(templateText);
+        var renderedText = template(data);
+        var renderedDom = $(renderedText);
+        $("#tablearea").empty();
+        $("#tablearea").append(renderedDom);
+    };
+
+    var fileUploadFail = function(data){};
+
+    var dragHandler = function(evt){
+        evt.preventDefault();
+    };
+
+    var dropHandler = function(evt){
+        evt.preventDefault();
+        var files = evt.originalEvent.dataTransfer.files;
+
+        var formData = new FormData();
+        formData.append("file2upload", files[0]);
+
+        var req = {
+            url: "/sendfile",
+            method: "post",
+            processData: false,
+            contentType: false,
+            data: formData,
+            success: function(){
+                window.location.href = "/success";
+            }
+        };
+
+        var promise = $.ajax(req);
+        promise;
+
+    };
+
+    var dropHandlerSet = {
+        dragover: dragHandler,
+        drop: dropHandler
+    };
+
+    $(".droparea").on(dropHandlerSet);
+
+    });
+</script>
