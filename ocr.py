@@ -25,6 +25,7 @@ class run_ocr:
         pages = convert_from_path(self._pdf)  # CHANGE THIS
 
         index = 1
+        # file path to store the images converted from input PDF
         img_path = 'sample' + self._doctype
 
         if img_path in os.listdir():
@@ -42,23 +43,29 @@ class run_ocr:
             '''
             if self._doctype == 'BaS':
                 if index == 1:
+                    # 850-2000 is the range that transaction details appears on the first page
+                    # values are calculated wrt bank statement from Citibank
                     crop = img[850:2000, :]
                     cv2.imwrite(pathlok, crop)
-                    # img_list.append(crop)a
                 else:
+                    # 370-2000 is the range that transaction details appears on the rest of the pages
+                    # values are calculated wrt bank statement from Citibank
                     crop = img[370:2000, :]
                     cv2.imwrite(pathlok, crop)
-                    # img_list.append(crop)
                 index += 1
             elif self._doctype == 'LR':
                 img = cv2.resize(img, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
                 hei, wid = img.shape
+                # belwo cropping is the range that contains loan repayment details
+                # values are calculated wrt loan repayment document from DBS
                 crop = img[int(0.34091 * hei):int(0.66061 * hei), int(0.19608 * wid):]
                 cv2.imwrite(pathlok, crop)
                 index += 1
             elif self._doctype == 'BiS':
                 img = cv2.resize(img, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
                 hei, wid = img.shape
+                # belwo cropping is the range that contains bill statement details
+                # values are calculated wrt bill statement from DBS
                 crop = img[int(0.26818 * hei):int(0.87045 * hei), int(0.21471 * wid):int(0.86471 * wid)]
                 cv2.imwrite(pathlok, crop)
                 index += 1
@@ -120,6 +127,7 @@ class run_ocr:
                 if datatype == 'int':
                     char = float(char[:-2] + '.' + char[-2:])
                 for j in range(1, len(y_sep)):
+                    # 0.5*line_dist is a buffer value to measure the coordinates
                     if i[1] < y_sep[j] - 0.5 * line_dist:
                         ' '.join([str(j) for j in i[:4]])
                         try:
@@ -169,8 +177,10 @@ class run_ocr:
         # print(boxes)
         # text = api.GetUTF8Text()
         # print(text)
+        # e is a buffer value to make the bounding box more accurate
         e = 4.5
 
+        # measured x-coordinate for each column of information
         x_sep = [172, 720, 950, 1180]
         column = [[] for i in range(len(x_sep) + 1)]
 
@@ -280,8 +290,11 @@ class run_ocr:
         # print(boxes)
         # text = api.GetUTF8Text()
         # print(text)
+
+        # e is a buffer value to make the bounding box more accurate
         e = 20
 
+        # measured x-coordinate for each column of information
         x_sep = [0.11765 * wid, 0.27059 * wid, 0.39216 * wid, 0.54902 * wid]
         column = [[] for i in range(len(x_sep) + 1)]
         '''
@@ -364,8 +377,11 @@ class run_ocr:
         # print(boxes)
         # text = api.GetUTF8Text()
         # print(text)
+
+        # e is a buffer value to make the bounding box more accurate
         e = 16
 
+        # measured x-coordinate for each column of information
         x_sep = [0.23529 * wid, 0.33031 * wid, 0.40723 * wid, 0.70135 * wid, 0.84615 * wid]
         column = [[] for i in range(len(x_sep) + 1)]
 
